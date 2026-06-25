@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Dashboard — DocBook{% endblock %}
+{% block content %}
+<h1 class="page-title">👨‍⚕️ Doctor Dashboard</h1>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="num">{{ slots.count }}</div>
+        <div class="label">Total Slots</div>
+    </div>
+    <div class="stat-card">
+        <div class="num">{{ bookings.count }}</div>
+        <div class="label">Bookings</div>
+    </div>
+    <div class="stat-card">
+        <div class="num">{{ slots|length }}</div>
+        <div class="label">Available</div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <h2>📅 My Availability Slots</h2>
+        <a href="{% url 'add_slot' %}" class="btn btn-primary btn-sm">+ Add Slot</a>
+    </div>
+
+    {% if slots %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for slot in slots %}
+                <tr>
+                    <td>{{ slot.date }}</td>
+                    <td>{{ slot.start_time|time:"H:i" }} – {{ slot.end_time|time:"H:i" }}</td>
+                    <td>
+                        {% if slot.is_booked %}
+                            <span class="badge badge-booked">Booked</span>
+                        {% elif not slot.is_future %}
+                            <span class="badge badge-past">Past</span>
+                        {% else %}
+                            <span class="badge badge-free">Available</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not slot.is_booked %}
+                            <form method="post" action="{% url 'delete_slot' slot.id %}" style="display:inline;" onsubmit="return confirm('Delete this slot?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        {% else %}
+                            <span style="color:#a0aec0;font-size:0.85rem;">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <div class="icon">📆</div>
+            <p>No slots yet. <a href="{% url 'add_slot' %}">Add your first availability slot</a>.</p>
+        </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>📋 Appointments</h2>
+    {% if bookings %}
+        <table>
+            <thead>
+                <tr><th>Patient</th><th>Date</th><th>Time</th><th>Notes</th><th>Booked At</th></tr>
+            </thead>
+            <tbody>
+            {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.patient.get_full_name|default:booking.patient.email }}</td>
+                    <td>{{ booking.slot.date }}</td>
+                    <td>{{ booking.slot.start_time|time:"H:i" }} – {{ booking.slot.end_time|time:"H:i" }}</td>
+                    <td>{{ booking.notes|default:"—" }}</td>
+                    <td>{{ booking.created_at|date:"M d, Y H:i" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <div class="icon">📋</div>
+            <p>No appointments yet.</p>
+        </div>
+    {% endif %}
+</div>
+
+<div style="text-align:right;">
+    <a href="{% url 'edit_doctor_profile' %}" class="btn btn-outline" style="color:#2b6cb0;border-color:#2b6cb0;">Edit Profile</a>
+</div>
+{% endblock %}

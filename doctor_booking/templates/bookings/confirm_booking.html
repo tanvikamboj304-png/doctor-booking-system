@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Booking — DocBook{% endblock %}
+{% block content %}
+<div class="form-card" style="max-width:500px;">
+    <h1>✅ Confirm Booking</h1>
+    <div class="card" style="background:#f0fff4;border:1px solid #9ae6b4;margin-bottom:1.5rem;">
+        <p><strong>Doctor:</strong> Dr. {{ slot.doctor.get_full_name|default:slot.doctor.username }}</p>
+        <p style="margin-top:0.5rem;"><strong>Date:</strong> {{ slot.date }}</p>
+        <p style="margin-top:0.5rem;"><strong>Time:</strong> {{ slot.start_time|time:"H:i" }} – {{ slot.end_time|time:"H:i" }}</p>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Notes / Reason for Visit (optional)</label>
+            <textarea name="notes" rows="3" placeholder="Describe your symptoms or reason for visit..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-success btn-block">Confirm Booking</button>
+    </form>
+    <div class="form-footer"><a href="{% url 'patient_dashboard' %}">← Cancel</a></div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Patient Dashboard — DocBook{% endblock %}
+{% block content %}
+<h1 class="page-title">👤 Patient Dashboard</h1>
+<p class="page-subtitle">Find a doctor and book an available slot.</p>
+
+<div class="card">
+    <h2>👨‍⚕️ Available Doctors</h2>
+    {% if doctors %}
+        <div class="grid grid-2">
+            {% for doctor in doctors %}
+                <div class="doctor-card">
+                    <h3>Dr. {{ doctor.get_full_name|default:doctor.username }}</h3>
+                    {% if doctor.doctor_profile.specialization %}
+                        <div class="spec">{{ doctor.doctor_profile.specialization }}</div>
+                    {% else %}
+                        <div class="spec" style="color:#cbd5e0;">General</div>
+                    {% endif %}
+                    <a href="{% url 'doctor_detail' doctor.id %}" class="btn btn-primary btn-sm">View Slots</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <div class="icon">👨‍⚕️</div>
+            <p>No doctors registered yet.</p>
+        </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>📋 My Bookings</h2>
+    {% if my_bookings %}
+        <table>
+            <thead>
+                <tr><th>Doctor</th><th>Date</th><th>Time</th><th>Notes</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+            {% for booking in my_bookings %}
+                <tr>
+                    <td>Dr. {{ booking.slot.doctor.get_full_name|default:booking.slot.doctor.username }}</td>
+                    <td>{{ booking.slot.date }}</td>
+                    <td>{{ booking.slot.start_time|time:"H:i" }} – {{ booking.slot.end_time|time:"H:i" }}</td>
+                    <td>{{ booking.notes|default:"—" }}</td>
+                    <td>
+                        {% if booking.slot.is_future %}
+                            <form method="post" action="{% url 'cancel_booking' booking.id %}" style="display:inline;" onsubmit="return confirm('Cancel this booking?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                            </form>
+                        {% else %}
+                            <span style="color:#a0aec0;font-size:0.85rem;">Past</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <div class="icon">📋</div>
+            <p>No bookings yet. Find a doctor above to book an appointment.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

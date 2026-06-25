@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings — DocBook{% endblock %}
+{% block content %}
+<h1 class="page-title">📋 My Bookings</h1>
+<div class="card">
+    {% if bookings %}
+        <table>
+            <thead>
+                <tr>
+                    {% if user.is_patient %}<th>Doctor</th>{% else %}<th>Patient</th>{% endif %}
+                    <th>Date</th><th>Time</th><th>Notes</th><th>Booked At</th>
+                    {% if user.is_patient %}<th>Action</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for booking in bookings %}
+                <tr>
+                    {% if user.is_patient %}
+                        <td>Dr. {{ booking.slot.doctor.get_full_name|default:booking.slot.doctor.username }}</td>
+                    {% else %}
+                        <td>{{ booking.patient.get_full_name|default:booking.patient.email }}</td>
+                    {% endif %}
+                    <td>{{ booking.slot.date }}</td>
+                    <td>{{ booking.slot.start_time|time:"H:i" }} – {{ booking.slot.end_time|time:"H:i" }}</td>
+                    <td>{{ booking.notes|default:"—" }}</td>
+                    <td>{{ booking.created_at|date:"M d, Y" }}</td>
+                    {% if user.is_patient %}
+                        <td>
+                            {% if booking.slot.is_future %}
+                                <form method="post" action="{% url 'cancel_booking' booking.id %}" onsubmit="return confirm('Cancel?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                                </form>
+                            {% else %}—{% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty"><div class="icon">📋</div><p>No bookings found.</p></div>
+    {% endif %}
+</div>
+{% endblock %}
