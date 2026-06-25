@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Dr. {{ doctor.get_full_name }} — DocBook{% endblock %}
+{% block content %}
+<a href="{% url 'patient_dashboard' %}" style="color:#2b6cb0;font-size:0.9rem;">← Back to Dashboard</a>
+
+<div class="card" style="margin-top:1rem;">
+    <h2>👨‍⚕️ Dr. {{ doctor.get_full_name|default:doctor.username }}</h2>
+    {% if profile and profile.specialization %}
+        <p style="color:#718096;margin-bottom:0.5rem;">{{ profile.specialization }}</p>
+    {% endif %}
+    {% if profile and profile.bio %}
+        <p style="margin-bottom:1rem;font-size:0.95rem;">{{ profile.bio }}</p>
+    {% endif %}
+    <p style="color:#718096;font-size:0.88rem;">📧 {{ doctor.email }}</p>
+</div>
+
+<div class="card">
+    <h2>📅 Available Slots</h2>
+    {% if slots %}
+        <div class="grid grid-3">
+            {% for slot in slots %}
+                <div class="slot-item" style="flex-direction:column;align-items:flex-start;gap:0.5rem;">
+                    <div style="font-weight:700;color:#1a365d;">{{ slot.date }}</div>
+                    <div class="time">{{ slot.start_time|time:"H:i" }} – {{ slot.end_time|time:"H:i" }}</div>
+                    <a href="{% url 'book_slot' slot.id %}" class="btn btn-success btn-sm">Book This Slot</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <div class="icon">📆</div>
+            <p>No available slots for this doctor at the moment.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

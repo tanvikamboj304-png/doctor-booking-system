@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Sign Up — DocBook{% endblock %}
+{% block content %}
+<div class="auth-hero">
+    <h1>🏥 DocBook</h1>
+    <p>Create your account to get started</p>
+</div>
+<div class="form-card">
+    <h1>Sign Up</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}{% for error in field.errors %}<div class="form-error">{{ error }}</div>{% endfor %}{% endif %}
+            </div>
+        {% endfor %}
+        {% if form.non_field_errors %}{% for error in form.non_field_errors %}<div class="alert alert-error" style="margin-bottom:1rem;">{{ error }}</div>{% endfor %}{% endif %}
+        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+    </form>
+    <div class="form-footer">Already have an account? <a href="{% url 'login' %}">Log in</a></div>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+Used Claude AI for:
+
+- Django project development
+- Debugging and fixing errors
+- Repository structure guidance
+- Feature implementation
+- Code review and improvements

@@ -1,0 +1,38 @@
+service: doctor-booking-email
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-east-1
+  environment:
+    SENDER_EMAIL: ${env:SENDER_EMAIL, 'noreply@doctorbooking.com'}
+
+plugins:
+  - serverless-offline
+
+functions:
+  sendBookingConfirmation:
+    handler: email_service/handler.send_booking_confirmation
+    events:
+      - http:
+          path: email/booking-confirmation
+          method: post
+          cors: true
+
+  sendBookingCancellation:
+    handler: email_service/handler.send_booking_cancellation
+    events:
+      - http:
+          path: email/booking-cancellation
+          method: post
+          cors: true
+
+  sendDoctorNotification:
+    handler: email_service/handler.send_doctor_notification
+    events:
+      - http:
+          path: email/doctor-notification
+          method: post
+          cors: true
